@@ -126,7 +126,7 @@ web::json::value {{classname}}::toJson() const
     return val;
 }
 
-void {{classname}}::fromJson(web::json::value& val)
+void {{classname}}::fromJson(const web::json::value& val)
 {
     {{#parent}}
     this->{{{parent}}}::fromJson(val);
