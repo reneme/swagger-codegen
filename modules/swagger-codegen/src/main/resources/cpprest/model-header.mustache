@@ -38,6 +38,9 @@ public:
     web::json::value toJson() const override;
     void fromJson(const web::json::value& json) override;
 
+    static const char *dtoName() { return "swagger::dto::{{classname}}"; }
+    static {{classname}} create(const web::json::value& json);
+
     void toMultipart(std::shared_ptr<MultipartFormData> multipart, const utility::string_t& namePrefix) const override;
     void fromMultiPart(std::shared_ptr<MultipartFormData> multipart, const utility::string_t& namePrefix) override;
 

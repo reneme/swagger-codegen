@@ -288,6 +288,13 @@ void {{classname}}::fromJson(const web::json::value& val)
     {{/vars}}
 }
 
+{{classname}} {{classname}}::create(const web::json::value& json)
+{
+    auto model = {{classname}}();
+    model.fromJson(json);
+    return model;
+}
+
 void {{classname}}::toMultipart(std::shared_ptr<MultipartFormData> multipart, const utility::string_t& prefix) const
 {
     utility::string_t namePrefix = prefix;
