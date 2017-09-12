@@ -8,12 +8,11 @@
 #ifndef {{modelHeaderGuardPrefix}}_ModelBase_H_
 #define {{modelHeaderGuardPrefix}}_ModelBase_H_
 
-{{{defaultInclude}}}
 #include "HttpContent.h"
-#include "MultipartFormData.h"
 
 #include <cpprest/details/basic_types.h>
 #include <cpprest/json.h>
+{{{defaultInclude}}}
 
 {{#modelNamespaceDeclarations}}
 namespace {{this}} {
@@ -29,9 +28,6 @@ public:
 
     virtual web::json::value toJson() const = 0;
     virtual void fromJson(const web::json::value& json) = 0;
-
-    virtual void toMultipart(std::shared_ptr<MultipartFormData> multipart, const utility::string_t& namePrefix) const = 0;
-    virtual void fromMultiPart(std::shared_ptr<MultipartFormData> multipart, const utility::string_t& namePrefix) = 0;
 
     static web::json::value toJson( const utility::string_t& value );
     static web::json::value toJson( const utility::datetime& value );
