@@ -2,6 +2,7 @@
 {{#models}}{{#model}}
 
 #include "{{classname}}.h"
+#include <type_traits>
 
 {{#modelNamespaceDeclarations}}
 namespace {{this}} {
@@ -573,6 +574,7 @@ void {{classname}}::{{setter}}({{{datatype}}} value)
 {{#isNotContainer}}
 {{{datatype}}} {{classname}}::{{getter}}() const
 {
+    when_shared_ptr<{{{datatype}}}>::verify_not_null_or_throw(m_{{name}});
     return m_{{name}};
 }
 

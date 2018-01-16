@@ -20,6 +20,7 @@
 namespace {{this}} {
 {{/modelNamespaceDeclarations}}
 
+
 /// <summary>
 /// {{description}}
 /// </summary>
@@ -49,9 +50,17 @@ public:
     /// <summary>
     /// {{description}}
     /// </summary>
-    {{^isNotContainer}}{{{datatype}}}& {{getter}}();
-    {{/isNotContainer}}{{#isNotContainer}}{{{datatype}}} {{getter}}() const;
-    {{/isNotContainer}}{{^required}}bool {{nameInCamelCase}}IsSet() const;
+    {{^isNotContainer}}
+    {{{datatype}}}& {{getter}}();
+    const {{{datatype}}}& {{getter}}() const;
+    void {{setter}}(const {{{datatype}}}& value);
+    {{/isNotContainer}}
+    {{#isNotContainer}}
+    {{{datatype}}} {{getter}}() const;
+    void {{setter}}({{{datatype}}} value);
+    {{/isNotContainer}}
+    {{^required}}
+    bool {{nameInCamelCase}}IsSet() const;
     void unset{{name}}();
     {{/required}}
     void {{setter}}({{{datatype}}} value);

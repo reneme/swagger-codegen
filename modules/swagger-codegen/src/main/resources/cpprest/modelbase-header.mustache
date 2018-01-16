@@ -8,6 +8,8 @@
 #ifndef {{modelHeaderGuardPrefix}}_ModelBase_H_
 #define {{modelHeaderGuardPrefix}}_ModelBase_H_
 
+#include <exception>
+
 #include "HttpContent.h"
 
 #include <cpprest/details/basic_types.h>
@@ -17,6 +19,23 @@
 {{#modelNamespaceDeclarations}}
 namespace {{this}} {
 {{/modelNamespaceDeclarations}}
+
+struct ptr_is_null : std::runtime_error {
+    using std::runtime_error::runtime_error;
+};
+
+template <class T>
+struct when_shared_ptr {
+    static void verify_not_null_or_throw(const T& value) {}
+};
+template <class T>
+struct when_shared_ptr<std::shared_ptr<T>> {
+    static void verify_not_null_or_throw(const std::shared_ptr<T>& value) {
+        if (!value) {
+            throw ptr_is_null("shared pointer is null");
+        }
+    }
+};
 
 class {{declspec}} ModelBase
 {
