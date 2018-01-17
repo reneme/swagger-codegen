@@ -53,11 +53,9 @@ public:
     {{^isNotContainer}}
     {{{datatype}}}& {{getter}}();
     const {{{datatype}}}& {{getter}}() const;
-    void {{setter}}(const {{{datatype}}}& value);
     {{/isNotContainer}}
     {{#isNotContainer}}
     {{{datatype}}} {{getter}}() const;
-    void {{setter}}({{{datatype}}} value);
     {{/isNotContainer}}
     {{^required}}
     bool {{nameInCamelCase}}IsSet() const;

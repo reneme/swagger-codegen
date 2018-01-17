@@ -52,19 +52,19 @@ std::shared_ptr<HttpContent> ModelBase::fileFromJson(const web::json::value& val
 
     if(val.has_field(utility::conversions::to_string_t("ContentDisposition")))
     {
-        content->setContentDisposition( ModelBase::stringFromJson(val[utility::conversions::to_string_t("ContentDisposition")]) );
+        content->setContentDisposition( ModelBase::stringFromJson(val.at(utility::conversions::to_string_t("ContentDisposition"))) );
     }
     if(val.has_field(utility::conversions::to_string_t("ContentType")))
     {
-        content->setContentType( ModelBase::stringFromJson(val[utility::conversions::to_string_t("ContentType")]) );
+        content->setContentType( ModelBase::stringFromJson(val.at(utility::conversions::to_string_t("ContentType"))) );
     }
     if(val.has_field(utility::conversions::to_string_t("FileName")))
     {
-        content->setFileName( ModelBase::stringFromJson(val[utility::conversions::to_string_t("FileName")]) );
+        content->setFileName( ModelBase::stringFromJson(val.at(utility::conversions::to_string_t("FileName"))) );
     }
     if(val.has_field(utility::conversions::to_string_t("InputStream")))
     {
-        content->setData( ModelBase::fromBase64( ModelBase::stringFromJson(val[utility::conversions::to_string_t("InputStream")]) ) );
+        content->setData( ModelBase::fromBase64( ModelBase::stringFromJson(val.at(utility::conversions::to_string_t("InputStream"))) ) );
     }
 
     return content;
