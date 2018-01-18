@@ -1,0 +1,62 @@
+{{>licenseInfo}}
+{{#models}}{{#model}}/*
+ * {{classname}}.h
+ *
+ * {{description}}
+ */
+
+#ifndef {{modelHeaderGuardPrefix}}_{{classname}}_H_
+#define {{modelHeaderGuardPrefix}}_{{classname}}_H_
+
+{{^parent}}
+{{{defaultInclude}}}
+#include "../ModelBase.h"
+{{/parent}}
+
+{{#imports}}{{{this}}}
+{{/imports}}
+
+{{#modelNamespaceDeclarations}}
+namespace {{this}} {
+{{/modelNamespaceDeclarations}}
+
+
+/**
+ * \brief {{description}}
+ */
+struct {{declspec}} {{classname}}
+    : public {{#parent}}{{{parent}}}{{/parent}}{{^parent}}ModelBase{{/parent}}
+{
+public:
+    {{classname}}();
+    virtual ~{{classname}}();
+
+    static const char *dtoName() { return "swagger::dto::{{classname}}"; }
+    static {{classname}} modelFromJson(const web::json::value& json);
+    // alias
+    inline static {{classname}} create(const web::json::value& json) {
+        return {{classname}}::modelFromJson(json);
+    }
+
+    web::json::value toJson() const override;
+    void fromJson(const web::json::value& json) override;
+
+    {{#vars}}
+    {{^isInherited}}
+    {{#required}}
+    {{{datatype}}} {{baseName}};
+    {{/required}}
+    {{^required}}
+    std::optional<{{{datatype}}}> {{baseName}};
+    {{/required}}
+    {{/isInherited}}
+    {{/vars}}
+};
+
+{{#modelNamespaceDeclarations}}
+}
+{{/modelNamespaceDeclarations}}
+
+#endif /* {{modelHeaderGuardPrefix}}_{{classname}}_H_ */
+{{/model}}
+{{/models}}

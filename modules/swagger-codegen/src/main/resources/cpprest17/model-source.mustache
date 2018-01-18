@@ -1,0 +1,345 @@
+{{>licenseInfo}}
+{{#models}}{{#model}}
+
+#include "{{classname}}.h"
+
+{{#modelNamespaceDeclarations}}
+namespace {{this}} {
+{{/modelNamespaceDeclarations}}
+
+{{classname}}::{{classname}}()
+{
+    {{#vars}}
+    {{^isInherited}}
+    {{#isNotContainer}}
+    {{#required}}
+    {{baseName}} = {{{defaultValue}}};
+    {{/required}}
+    {{^required}}
+    {{baseName}} = std::nullopt;
+    {{/required}}
+    {{/isNotContainer}}
+    {{/isInherited}}
+    {{/vars}}
+}
+
+{{classname}}::~{{classname}}()
+{
+}
+
+{{classname}} {{classname}}::modelFromJson(const web::json::value& json)
+{
+    auto model = {{classname}}();
+    model.fromJson(json);
+    return model;
+}
+
+web::json::value {{classname}}::toJson() const
+{
+    {{#parent}}
+    web::json::value val = this->{{{parent}}}::toJson();
+    {{/parent}}
+    {{^parent}}
+    web::json::value val = web::json::value::object();
+    {{/parent}}
+
+    {{#vars}}
+    {{^isInherited}}
+    {{#isPrimitiveType}}
+    {{^isListContainer}}
+    {{^isMapContainer}}
+    {{^required}}
+    if({{baseName}})
+    {
+        val[utility::conversions::to_string_t("{{baseName}}")] = ModelBase::toJson({{baseName}}.value());
+    }
+    {{/required}}
+    {{#required}}
+    val[utility::conversions::to_string_t("{{baseName}}")] = ModelBase::toJson({{baseName}}.value());
+    {{/required}}
+    {{/isMapContainer}}
+    {{/isListContainer}}
+    {{/isPrimitiveType}}
+    {{#isListContainer}}
+    {
+        std::vector<web::json::value> jsonArray;
+        {{#required}}
+        for (auto& item : {{baseName}})
+        {
+            jsonArray.push_back(ModelBase::toJson(item));
+        }
+        val[utility::conversions::to_string_t("{{baseName}}")] = web::json::value::array(jsonArray);
+        {{/required}}
+        {{^required}}
+        if ({{baseName}})
+        {
+            for (auto& item : {{baseName}}.value())
+            {
+                jsonArray.push_back(ModelBase::toJson(item));
+            }
+            if( !jsonArray.empty() )
+            {
+                val[utility::conversions::to_string_t("{{baseName}}")] = web::json::value::array(jsonArray);
+            }
+        }
+        {{/required}}
+    }
+    {{/isListContainer}}
+    {{#isMapContainer}}
+    {
+        std::vector<web::json::value> jsonArray;
+        {{#required}}
+        for (auto& item : {{baseName}})
+        {
+            web::json::value tmp = web::json::value::object();
+            tmp[utility::conversions::to_string_t("key")] = ModelBase::toJson(item.first);
+            tmp[utility::conversions::to_string_t("value")] = ModelBase::toJson(item.second);
+            jsonArray.push_back(tmp);
+        }
+        val[utility::conversions::to_string_t("{{baseName}}")] = web::json::value::array(jsonArray);
+        {{/required}}
+        {{^required}}
+        if ({{baseName}})
+        {
+            for (auto& item : {{baseName}}.value())
+            {
+                web::json::value tmp = web::json::value::object();
+                tmp[utility::conversions::to_string_t("key")] = ModelBase::toJson(item.first);
+                tmp[utility::conversions::to_string_t("value")] = ModelBase::toJson(item.second);
+                jsonArray.push_back(tmp);
+            }
+            if (!jsonArray.empty())
+            {
+                val[utility::conversions::to_string_t("{{baseName}}")] = web::json::value::array(jsonArray);
+            }
+        }
+        {{/required}}
+    }
+    {{/isMapContainer}}
+    {{^isListContainer}}
+    {{^isMapContainer}}
+    {{^isPrimitiveType}}
+    {{^required}}
+    if ({{baseName}})
+    {
+        val[utility::conversions::to_string_t("{{baseName}}")] = ModelBase::toJson({{baseName}}.value());
+    }
+    {{/required}}
+    {{#required}}
+    val[utility::conversions::to_string_t("{{baseName}}")] = ModelBase::toJson({{baseName}});
+    {{/required}}
+    {{/isPrimitiveType}}
+    {{/isMapContainer}}
+    {{/isListContainer}}
+    {{/isInherited}}
+    {{/vars}}
+
+    return val;
+}
+
+void {{classname}}::fromJson(const web::json::value& val)
+{
+    {{#parent}}
+    this->{{{parent}}}::fromJson(val);
+    {{/parent}}
+
+    {{#vars}}
+    {{^isInherited}}
+    {{#isPrimitiveType}}
+    {{^isListContainer}}
+    {{^isMapContainer}}
+    {{^required}}
+    if (val.has_field(utility::conversions::to_string_t("{{baseName}}")))
+    {
+        {{baseName}} = ModelBase::{{baseType}}FromJson(val.at(utility::conversions::to_string_t("{{baseName}}")));
+    } else {
+        {{baseName}} = std::nullopt;
+    }
+    {{/required}}
+    {{#required}}
+    {{baseName}} == ModelBase::{{baseType}}FromJson(val.at(utility::conversions::to_string_t("{{baseName}}")));
+    {{/required}}
+    {{/isMapContainer}}
+    {{/isListContainer}}
+    {{/isPrimitiveType}}
+    {{#isListContainer}}
+    {
+        std::vector<web::json::value> jsonArray;
+        {{#required}}
+        {{baseName}}.clear();
+        for (auto& item : val.at(utility::conversions::to_string_t("{{baseName}}")).as_array())
+        {
+            {{#items.isPrimitiveType}}
+            {{baseName}}.push_back(ModelBase::{{items.baseType}}FromJson(item));
+            {{/items.isPrimitiveType}}
+            {{^items.isPrimitiveType}}
+            {{#items.isString}}
+            {{baseName}}.push_back(ModelBase::stringFromJson(item));
+            {{/items.isString}}
+            {{^items.isString}}
+            {{#items.isDateTime}}
+            {{baseName}}.push_back(ModelBase::dateFromJson(item));
+            {{/items.isDateTime}}
+            {{^items.isDateTime}}
+            if (!item.is_null())
+            {
+                {{baseName}}.push_back( {{items.datatype}}::modelFromJson(item) );
+            }
+            {{/items.isDateTime}}
+            {{/items.isString}}
+            {{/items.isPrimitiveType}}
+        }
+        {{/required}}
+        {{^required}}
+        {{baseName}} = std::nullopt;
+        if (val.has_field(utility::conversions::to_string_t("{{baseName}}")))
+        {
+            {{baseName}} = {{{datatype}}}();
+            for (auto& item : val.at(utility::conversions::to_string_t("{{baseName}}")).as_array())
+            {
+                {{#items.isPrimitiveType}}
+                {{baseName}}->push_back(ModelBase::{{items.baseType}}FromJson(item));
+                {{/items.isPrimitiveType}}
+                {{^items.isPrimitiveType}}
+                {{#items.isString}}
+                {{baseName}}->push_back(ModelBase::stringFromJson(item));
+                {{/items.isString}}
+                {{^items.isString}}
+                {{#items.isDateTime}}
+                {{baseName}}->push_back(ModelBase::dateFromJson(item));
+                {{/items.isDateTime}}
+                {{^items.isDateTime}}
+                if (!item.is_null())
+                {
+                    {{baseName}}->push_back( {{items.datatype}}::modelFromJson(item) );
+                }
+                {{/items.isDateTime}}
+                {{/items.isString}}
+                {{/items.isPrimitiveType}}
+            }
+        }
+        {{/required}}
+    }
+    {{/isListContainer}}
+    {{#isMapContainer}}
+    {
+        std::vector<web::json::value> jsonArray;
+        {{#required}}
+        {{baseName}}.clear();
+        for (auto& item : val.at(utility::conversions::to_string_t("{{baseName}}")).as_array())
+        {  
+            utility::string_t key;
+            if(item.has_field(utility::conversions::to_string_t("key")))
+            {
+                key = ModelBase::stringFromJson(item[utility::conversions::to_string_t("key")]);
+            }
+            {{#items.isPrimitiveType}}
+            {{baseName}}.insert(std::pair<utility::string_t,{{{items.datatype}}}>( key, ModelBase::{{items.baseType}}FromJson(item[utility::conversions::to_string_t("value")])));
+            {{/items.isPrimitiveType}}
+            {{^items.isPrimitiveType}}
+            {{#items.isString}}
+            {{baseName}}.insert(std::pair<utility::string_t,{{{items.datatype}}}>( key, ModelBase::stringFromJson(item[utility::conversions::to_string_t("value")])));
+            {{/items.isString}}
+            {{^items.isString}}
+            {{#items.isDateTime}}
+            {{baseName}}.insert(std::pair<utility::string_t,{{{items.datatype}}}>( key, ModelBase::dateFromJson(item[utility::conversions::to_string_t("value")])));
+            {{/items.isDateTime}}
+            {{^items.isDateTime}}
+            if(item.is_null())
+            {
+                {{baseName}}.insert(std::pair<utility::string_t,{{{items.datatype}}}>( key, {{{items.datatype}}}(nullptr) ));
+            }
+            else
+            {
+                {{baseName}}.insert(std::pair<utility::string_t,{{{items.datatype}}}>( key, {{items.datatype}}::modelFromJson(item.at(utility::conversions::to_string_t("value")))));
+            }
+            {{/items.isDateTime}}
+            {{/items.isString}}
+            {{/items.isPrimitiveType}}
+        }
+        {{/required}}
+        {{^required}}
+        {{baseName}} = std::nullopt;
+        if (val.has_field(utility::conversions::to_string_t("{{baseName}}")))
+        {
+            {{baseName}} = {{{datatype}}}();
+            for (auto& item : val.at(utility::conversions::to_string_t("{{baseName}}")).as_array())
+            {  
+                utility::string_t key;
+                if(item.has_field(utility::conversions::to_string_t("key")))
+                {
+                    key = ModelBase::stringFromJson(item.at(utility::conversions::to_string_t("key")));
+                }
+                {{#items.isPrimitiveType}}
+                {{baseName}}.insert(std::make_pair( key, ModelBase::{{items.baseType}}FromJson(item[utility::conversions::to_string_t("value")))));
+                {{/items.isPrimitiveType}}
+                {{^items.isPrimitiveType}}
+                {{#items.isString}}
+                {{baseName}}.insert(std::make_pair( key, ModelBase::stringFromJson(item[utility::conversions::to_string_t("value")))));
+                {{/items.isString}}
+                {{^items.isString}}
+                {{#items.isDateTime}}
+                {{baseName}}.insert(std::make_pair( key, ModelBase::dateFromJson(item[utility::conversions::to_string_t("value")))));
+                {{/items.isDateTime}}
+                {{^items.isDateTime}}
+                if (!item.is_null())
+                {
+                    {{baseName}}.insert(std::make_pair( key, {{items.datatype}}::modelFromJson(item.at(utility::conversions::to_string_t("value")))));
+                }
+                {{/items.isDateTime}}
+                {{/items.isString}}
+                {{/items.isPrimitiveType}}
+            }
+        }
+        {{/required}}
+    }
+    {{/isMapContainer}}
+    {{^isListContainer}}
+    {{^isMapContainer}}
+    {{^isPrimitiveType}}
+    {{^required}}
+    {{baseName}} = std::nullopt;
+    if (val.has_field(utility::conversions::to_string_t("{{baseName}}")))
+    {
+        {{#isString}}
+        {{baseName}} = ModelBase::stringFromJson(val.at(utility::conversions::to_string_t("{{baseName}}")));
+        {{/isString}}
+        {{^isString}}
+        {{#isDateTime}}
+        {{baseName}} = ModelBase::dateFromJson(val.at(utility::conversions::to_string_t("{{baseName}}")));
+        {{/isDateTime}}
+        {{^isDateTime}}
+        if (!val.at(utility::conversions::to_string_t("{{baseName}}")).is_null())
+        {
+            {{baseName}} = {{items.datatype}}::modelFromJson(val.at(utility::conversions::to_string_t("value")));
+        }
+        {{/isDateTime}}
+        {{/isString}}
+    }
+    {{/required}}
+    {{#required}}
+    {{#isString}}
+    {{baseName}} = ModelBase::stringFromJson(val.at(utility::conversions::to_string_t("{{baseName}}")));
+    {{/isString}}
+    {{^isString}}
+    {{#isDateTime}}
+    {{baseName}} = ModelBase::dateFromJson(val.at(utility::conversions::to_string_t("{{baseName}}")));
+    {{/isDateTime}}
+    {{^isDateTime}}
+    {{baseName}} = {{items.datatype}}::modelFromJson(val.at(utility::conversions::to_string_t("value")));
+    {{/isDateTime}}
+    {{/isString}}
+    {{/required}}
+    {{/isPrimitiveType}}
+    {{/isMapContainer}}
+    {{/isListContainer}}
+    {{/isInherited}}
+    {{/vars}}
+}
+
+{{#modelNamespaceDeclarations}}
+}
+{{/modelNamespaceDeclarations}}
+
+{{/model}}
+{{/models}}
