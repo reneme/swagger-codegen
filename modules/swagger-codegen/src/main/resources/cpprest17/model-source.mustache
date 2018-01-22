@@ -55,7 +55,7 @@ web::json::value {{classname}}::toJson() const
     }
     {{/required}}
     {{#required}}
-    val[utility::conversions::to_string_t("{{baseName}}")] = ModelBase::toJson({{baseName}}.value());
+    val[utility::conversions::to_string_t("{{baseName}}")] = ModelBase::toJson({{baseName}});
     {{/required}}
     {{/isMapContainer}}
     {{/isListContainer}}
@@ -157,7 +157,7 @@ void {{classname}}::fromJson(const web::json::value& val)
     }
     {{/required}}
     {{#required}}
-    {{baseName}} == ModelBase::{{baseType}}FromJson(val.at(utility::conversions::to_string_t("{{baseName}}")));
+    {{baseName}} = ModelBase::{{baseType}}FromJson(val.at(utility::conversions::to_string_t("{{baseName}}")));
     {{/required}}
     {{/isMapContainer}}
     {{/isListContainer}}
@@ -311,7 +311,7 @@ void {{classname}}::fromJson(const web::json::value& val)
         {{^isDateTime}}
         if (!val.at(utility::conversions::to_string_t("{{baseName}}")).is_null())
         {
-            {{baseName}} = {{items.datatype}}::modelFromJson(val.at(utility::conversions::to_string_t("value")));
+            {{baseName}} = {{datatype}}::modelFromJson(val.at(utility::conversions::to_string_t("value")));
         }
         {{/isDateTime}}
         {{/isString}}
@@ -326,7 +326,7 @@ void {{classname}}::fromJson(const web::json::value& val)
     {{baseName}} = ModelBase::dateFromJson(val.at(utility::conversions::to_string_t("{{baseName}}")));
     {{/isDateTime}}
     {{^isDateTime}}
-    {{baseName}} = {{items.datatype}}::modelFromJson(val.at(utility::conversions::to_string_t("value")));
+    {{baseName}} = {{datatype}}::modelFromJson(val.at(utility::conversions::to_string_t("value")));
     {{/isDateTime}}
     {{/isString}}
     {{/required}}

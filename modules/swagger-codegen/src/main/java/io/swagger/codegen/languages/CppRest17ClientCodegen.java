@@ -310,7 +310,7 @@ public class CppRest17ClientCodegen extends AbstractCppCodegen {
             return toModelName(swaggerType);
         }
 
-        return "std::shared_ptr<" + swaggerType + ">";
+        return swaggerType;
     }
 
     @Override

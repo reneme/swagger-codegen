@@ -21,9 +21,11 @@ namespace {{this}} {
 {{/modelNamespaceDeclarations}}
 
 
+{{#description}}
 /**
  * \brief {{description}}
  */
+{{/description}}
 struct {{declspec}} {{classname}}
     : public {{#parent}}{{{parent}}}{{/parent}}{{^parent}}ModelBase{{/parent}}
 {
