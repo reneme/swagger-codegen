@@ -77,10 +77,7 @@ web::json::value {{classname}}::toJson() const
             {
                 jsonArray.push_back(ModelBase::toJson(item));
             }
-            if( !jsonArray.empty() )
-            {
-                val[utility::conversions::to_string_t("{{baseName}}")] = web::json::value::array(jsonArray);
-            }
+            val[utility::conversions::to_string_t("{{baseName}}")] = web::json::value::array(jsonArray);
         }
         {{/required}}
     }
@@ -108,10 +105,7 @@ web::json::value {{classname}}::toJson() const
                 tmp[utility::conversions::to_string_t("value")] = ModelBase::toJson(item.second);
                 jsonArray.push_back(tmp);
             }
-            if (!jsonArray.empty())
-            {
-                val[utility::conversions::to_string_t("{{baseName}}")] = web::json::value::array(jsonArray);
-            }
+            val[utility::conversions::to_string_t("{{baseName}}")] = web::json::value::array(jsonArray);
         }
         {{/required}}
     }
